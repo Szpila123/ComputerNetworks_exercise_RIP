@@ -37,9 +37,9 @@ int main(){
                     ifces[i].addr,
                    &ifces[i].mask,
                    &ifces[i].dist
-		 )
+         )
             < 3 
-	  )
+      )
             error( 1, 0, "Supplied address in line %d is in incorrect format\n", i + 1);
     //---------------------------------------------------------------------------------------------------------------
 
@@ -54,14 +54,14 @@ int main(){
     server_addr.sin_port            = htons(LISTEN_PORT);
     server_addr.sin_addr.s_addr     = htonl(INADDR_ANY);
 
-	if( bind(
+    if( bind(
                     udp_socketfd,
                     (struct sockaddr*) &server_addr,
                     sizeof( server_addr )
                 )
             != 0
           )
-		error( 1, 0, "Couldnt bind the listening socket to the port\n");
+        error( 1, 0, "Couldnt bind the listening socket to the port\n");
     //---------------------------------------------------------------------------------------------------------------
     
     //create sending sockets for each interface----------------------------------------------------------------------
@@ -71,34 +71,32 @@ int main(){
     bzero( &soc_addr, sizeof(soc_addr) );
     soc_addr.sin_family        = AF_INET;
 
-    for( int i = 0 ; i< nof_ifcs; i++ ){
+    for( int i = 0 ; i < nof_ifcs; i++ ){
 
-        sending_soc            = socket(AF_INET, SOCK_DGRAM, 0 );
+        sending_soc = socket(AF_INET, SOCK_DGRAM, 0 );
 
         if( sending_soc == -1 )
             error( 1, 0, "Error while creating sending socket\n");
 
-	inet_pton( AF_INET, ifces[i].addr, &server_addr.sin_addr );
+        inet_pton( AF_INET, ifces[i].addr, &server_addr.sin_addr );
 
-	if( bind( sending_soc, (struct sockaddr*) &soc_addr, sizeof(soc_addr) ) != 0 )
+        if( bind( sending_soc, (struct sockaddr*) &soc_addr, sizeof(soc_addr) ) != 0 )
             error( 1, 0, "Error while binding sending socket to the address\n" );
 
-	ifces[i].sock_fd = sending_soc;
+        ifces[i].sock_fd = sending_soc;
     }
 
     //---------------------------------------------------------------------------------------------------------------
     
     
-	
+    
     //main loop------------------------------------------------------------------------------------------------------
     //Initialize routing info 
     Init_routing_info( nof_ifcs, ifces );
     for(;;){
-
         Recv_routing_info( udp_socketfd, TURN );
-	Send_routing_info( LISTEN_PORT );
-	End_turn();
-
+        Send_routing_info( LISTEN_PORT );
+        End_turn();
     }
 
     //program will never reach that part
