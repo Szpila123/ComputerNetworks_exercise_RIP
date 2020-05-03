@@ -52,7 +52,7 @@ uint32_t r_info_size;
 
 
 static ifce_s *ifces;
-static int32_t nof_ifcs;
+static uint32_t nof_ifcs;
 
 //Helping functions
 static uint32_t get_mask( uint8_t decimal_mask );
@@ -82,7 +82,7 @@ void Init_routing_info( int32_t arg_nof_ifcs , ifce_s *arg_ifces){
     int broadcastPermission = 1;
 
 
-    for( int i = 0 ; i < nof_ifcs ; i++ ){
+    for( uint32_t i = 0 ; i < nof_ifcs ; i++ ){
         setsockopt( ifces[i].sock_fd, SOL_SOCKET, SO_BROADCAST,
                      (void*) &broadcastPermission,
                      sizeof(broadcastPermission) );
@@ -219,7 +219,7 @@ void Send_routing_info( int32_t port ){
     broadcast_addr.sin_port          = htons(port);
 
 
-    for( int i = 0 ; i < nof_ifcs ; i++ ){
+    for( uint32_t i = 0 ; i < nof_ifcs ; i++ ){
 
         //get address of the interface
         inet_pton( AF_INET, ifces[i].addr, &broadcast_addr.sin_addr);
@@ -264,14 +264,20 @@ void Send_routing_info( int32_t port ){
 
 void End_turn(){
     for( uint32_t i = 0 ; i < r_info_recs ; i++ ){
-        if( r_info[i].dist >= MAX_DIST )
+        if( r_info[i].dist >= MAX_DIST  && i >= nof_ifcs )
             continue;
 
         char addr[16];
+        char dist[16];
         uint32_t addr_net = htonl(r_info[i].addr);
-        inet_ntop( AF_INET, &addr_net, addr, sizeof(addr) );
 
-        printf("%s/%d distance %d %s %s\n", addr, r_info[i].mask, r_info[i].dist,
+        inet_ntop( AF_INET, &addr_net, addr, sizeof(addr) );
+        sprintf( dist, "distance %d", r_info[i].dist );
+
+        printf("%s/%d %s %s %s\n",
+                addr,
+                r_info[i].mask,
+                r_info[i].dist >= MAX_DIST ? "unrechable" : dist,
                 r_info[i].is_indirect ? "via" : "connected",
                 r_info[i].is_indirect ? r_info[i].next_addr : "directly"  );
 
