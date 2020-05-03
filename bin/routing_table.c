@@ -118,54 +118,54 @@ void Recv_routing_info( int32_t soc_fd, int32_t turn_time ){
     socklen_t sender_len = sizeof( sender );
 
     for(;;){
-    FD_ZERO( &descriptors );
-    FD_SET( soc_fd, &descriptors );
+        FD_ZERO( &descriptors );
+        FD_SET( soc_fd, &descriptors );
 
-    ready = select( soc_fd + 1, &descriptors, NULL, NULL, &tv );
+        ready = select( soc_fd + 1, &descriptors, NULL, NULL, &tv );
 
-    if( ready == -1 ){
+        if( ready == -1 ){
             if( errno == EINTR )
                 continue;
             else
                 error( 1, 0, "select function failed\n" );
-    } else if( ready == 0 )
+        } else if( ready == 0 )
             break;
-    
-    ssize_t    packet_len = recvfrom(
-                                soc_fd,
-                                buffer,
-                IP_MAXPACKET,
-                0,
-                (struct sockaddr*) &sender,
-                &sender_len
-                 );
+        
+        ssize_t    packet_len = recvfrom(
+                                    soc_fd,
+                                    buffer,
+                                    IP_MAXPACKET,
+                                    0,
+                                    (struct sockaddr*) &sender,
+                                    &sender_len
+                                );
 
-    if( packet_len != 9 ){
-        #ifdef DEBUG
+        if( packet_len != 9 ){
+            #ifdef DEBUG
                 printf( "Got a package of wrong size\n" );
-        #endif //DEBUG
-        continue;
-    }
-    else{
-        #ifdef DEBUG
+            #endif //DEBUG
+            continue;
+        }
+        else{
+            #ifdef DEBUG
                 printf( "Got a package of right size\n" );
-        #endif //DEBUG
-    }
+            #endif //DEBUG
+        }
 
-    //Translete data from packet to little endian
-    udp_data data; 
-    data.addr     = ntohl( *((int32_t*)buffer) );
-    data.addr    &= get_mask( *((int8_t*)  (buffer+sizeof(int32_t)                  )) );
-    data.mask     = ntohl(    *((int8_t*)  (buffer+sizeof(int32_t)                  )) );
-    data.dist     = ntohl(    *((int32_t*) (buffer+sizeof(int32_t)+sizeof(int8_t)   )) );
+        //Translete data from packet to little endian
+        udp_data data; 
+        data.addr     = ntohl( *((int32_t*)buffer) );
+        data.addr    &= get_mask( *((int8_t*)  (buffer+sizeof(int32_t)                  )) );
+        data.mask     = ntohl(    *((int8_t*)  (buffer+sizeof(int32_t)                  )) );
+        data.dist     = ntohl(    *((int32_t*) (buffer+sizeof(int32_t)+sizeof(int8_t)   )) );
 
-    //Convert sender address
-    char ip_addr[16];
-    if( ip_addr != inet_ntop(AF_INET, &(sender.sin_addr), ip_addr, sizeof(ip_addr)) )
+        //Convert sender address
+        char ip_addr[16];
+        if( ip_addr != inet_ntop(AF_INET, &(sender.sin_addr), ip_addr, sizeof(ip_addr)) )
             break;
 
-    //Get distance to sender
-    uint32_t dist = get_dist( sender.sin_addr.s_addr );
+        //Get distance to sender
+        uint32_t dist = get_dist( sender.sin_addr.s_addr );
 
         //Look for network address in routing table
         uint32_t i = 0;
@@ -178,15 +178,16 @@ void Recv_routing_info( int32_t soc_fd, int32_t turn_time ){
                      r_info[i].last_info    = TTL;
                 }
                 else if( r_info[i].dist > data.dist + dist && !is_addr_mine(ip_addr)){
-                     r_info[i].dist             = data.dist + dist;
+                     r_info[i].dist         = data.dist + dist;
                      r_info[i].last_info    = TTL;
                      strcpy( r_info[i].next_addr, ip_addr );
                 }
+                i = 0;
                 break;
             }
-    }
+        }
 
-    //If network was not found in the routing table add it as new record
+        //If network was not found in the routing table add it as new record
         if( i == r_info_recs )
             rinfo_add( data.addr, data.mask, ip_addr, data.dist );
     }
@@ -242,12 +243,14 @@ void Send_routing_info( int32_t port ){
 
 void End_turn(){
     for( uint32_t i = 0 ; i < r_info_recs ; i++ ){
-    char addr[16];
-    inet_ntop( AF_INET, &r_info[i].addr, addr, sizeof(addr) );
+        char addr[16];
+        inet_ntop( AF_INET, &r_info[i].addr, addr, sizeof(addr) );
+
         printf("%s/%d distance %d %s %s\n", addr, r_info[i].mask, r_info[i].dist,
             r_info[i].is_indirect ? "via" : "connected", r_info[i].is_indirect ? r_info[i].next_addr : "directly"  );
-    if( --r_info[i].last_info == 0 )
-            r_info[i].dist = MAX_DIST;
+
+        if( --r_info[i].last_info == 0 )
+                r_info[i].dist = MAX_DIST;
     }
     return;
 }
@@ -285,10 +288,12 @@ static uint32_t get_mask( uint8_t decimal_mask ){
 //add record to routing table, maybe resize the table
 static void rinfo_add( uint32_t addr, int8_t mask, char *next_addr, int32_t dist ){
     if( r_info_recs == r_info_size ){
-        r_info_size *= 2;
-        r_info = (rout_info_t*) realloc( r_info, r_info_size );
-    if( r_info == NULL )
-        error( 1, 0, "Couldnt resize the routing info table\n" );
+
+        r_info_size    *= 2;
+        r_info          = (rout_info_t*) realloc( r_info, r_info_size );
+
+        if( r_info == NULL )
+            error( 1, 0, "Couldnt resize the routing info table\n" );
     }
 
     int idx    = r_info_recs++;
