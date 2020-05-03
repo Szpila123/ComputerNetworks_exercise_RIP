@@ -348,7 +348,7 @@ static void rinfo_add( uint32_t addr, int8_t mask, char *next_addr, int32_t dist
 }
 
 static int32_t is_addr_mine( char* addr ){
-    for( int i = 0 ; i < nof_ifcs ; i++ )
+    for( uint32_t i = 0 ; i < nof_ifcs ; i++ )
         if( strcmp(ifces[i].addr, addr ) == 0)
             return TRUE;
     return FALSE;
@@ -357,7 +357,7 @@ static int32_t is_addr_mine( char* addr ){
 static uint32_t get_dist( uint32_t addr ){
     uint32_t network_addr;
     uint32_t mask;
-    for( int i = 0 ; i < nof_ifcs ; i++ ){
+    for( uint32_t i = 0 ; i < nof_ifcs ; i++ ){
         inet_pton( AF_INET, ifces[i].addr, &network_addr );
         mask = get_mask( ifces[i].mask );
         if( (mask & ntohl(network_addr)) == (mask & addr) )
