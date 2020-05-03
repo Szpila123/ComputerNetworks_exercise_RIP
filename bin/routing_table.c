@@ -84,8 +84,8 @@ void Init_routing_info( int32_t arg_nof_ifcs , ifce_s *arg_ifces){
 
     for( int i = 0 ; i < nof_ifcs ; i++ ){
         setsockopt( ifces[i].sock_fd, SOL_SOCKET, SO_BROADCAST,
-                (void*) &broadcastPermission,
-                 sizeof(broadcastPermission) );
+                     (void*) &broadcastPermission,
+                     sizeof(broadcastPermission) );
 
         if( inet_pton( AF_INET, ifces[i].addr, &addr )  != 1 )
             error( 1, 0, "Couldn't translate an address from text to binary\n" );
@@ -211,15 +211,23 @@ void Send_routing_info( int32_t port ){
 
 
     for( int i = 0 ; i < nof_ifcs ; i++ ){
+
         //get address of the interface
         inet_pton( AF_INET, ifces[i].addr, &broadcast_addr.sin_addr);
+
         //apply mask on the broadcast address
         broadcast_addr.sin_addr.s_addr |= get_mask(32 - ifces[i].mask);
         uint8_t data[DATA_SIZE];
 
+
         //Send data about each known network
         for( uint32_t j = 0 ; j < r_info_recs ; j++ )
             if( r_info[j].dist < MAX_DIST ){
+                //Prepare package data
+                *((int32_t*)  data    )      = htonl(r_info[j].addr);
+                *((int8_t*)  (data+4) )      = r_info[j].mask;
+                *((int32_t*) (data+5) )      = htonl(r_info[j].dist);
+
                 if( sendto( ifces[i].sock_fd, data, DATA_SIZE, MSG_DONTROUTE,
                             (struct sockaddr*) &broadcast_addr, sizeof(broadcast_addr) ) < 0 ){ 
                     //Note that ifces[i] and r_info[i] describe the same network for i < nof_ifces
