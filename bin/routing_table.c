@@ -15,8 +15,7 @@
 #include <netinet/ip.h>
 #include <arpa/inet.h>
 
-
-#define DEBUG
+//#define DEBUG
 
 #define TRUE  1
 #define FALSE 0
