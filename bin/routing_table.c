@@ -64,7 +64,7 @@ static int32_t is_addr_mine( char* addr );
 
 void Init_routing_info( int32_t arg_nof_ifcs , ifce_s *arg_ifces){
     //Initializa the number of records, number of interfaces and size of routing table
-    r_info_recs    = arg_nof_ifcs;
+    r_info_recs    = 0;
     nof_ifcs       = arg_nof_ifcs;
     r_info_size    = arg_nof_ifcs * 2;
 
