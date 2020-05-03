@@ -327,7 +327,7 @@ static void rinfo_add( uint32_t addr, int8_t mask, char *next_addr, int32_t dist
     r_info[idx].mask           = mask;
     r_info[idx].dist           = dist;
     r_info[idx].last_info      = TTL;
-    r_info[idx].addr           = addr;
+    r_info[idx].addr           = addr & get_mask( mask );
 
     strcpy( r_info[idx].next_addr, next_addr ); 
 
