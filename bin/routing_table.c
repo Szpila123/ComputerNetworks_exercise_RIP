@@ -346,8 +346,8 @@ static uint32_t get_dist( uint32_t addr ){
     uint32_t mask;
     for( int i = 0 ; i < nof_ifcs ; i++ ){
         inet_pton( AF_INET, ifces[i].addr, &network_addr );
-        mask = get_mask( 32 - ifces[i].mask );
-        if( (mask & network_addr) == (mask & addr) )
+        mask = get_mask( ifces[i].mask );
+        if( (mask & ntohl(network_addr)) == (mask & addr) )
             return ifces[i].dist;
     }
     return MAX_DIST;
