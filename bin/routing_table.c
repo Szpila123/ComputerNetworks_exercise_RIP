@@ -90,6 +90,9 @@ void Init_routing_info( int32_t arg_nof_ifcs , ifce_s *arg_ifces){
         if( inet_pton( AF_INET, ifces[i].addr, &addr )  != 1 )
             error( 1, 0, "Couldn't translate an address from text to binary\n" );
 
+        //after conversion addr is in network notation, so we need to fix it...
+        addr = ntohl(addr);
+
         rinfo_add( addr, ifces[i].mask, &empty_str, ifces[i].dist );
     }
     
@@ -155,10 +158,10 @@ void Recv_routing_info( int32_t soc_fd, int32_t turn_time ){
         //Translete data from packet to little endian
         udp_data data; 
         data.addr     = ntohl( *((int32_t*)buffer) );
-        data.addr    &= get_mask( *((int8_t*)  (buffer+sizeof(int32_t)                  )) );
-        data.mask     = ntohl(    *((int8_t*)  (buffer+sizeof(int32_t)                  )) );
+        data.mask     =           *((int8_t*)  (buffer+sizeof(int32_t)                  ))  ;
         data.dist     = ntohl(    *((int32_t*) (buffer+sizeof(int32_t)+sizeof(int8_t)   )) );
 
+        data.addr    &= get_mask( data.mask );
         //Convert sender address
         char ip_addr[16];
         if( ip_addr != inet_ntop(AF_INET, &(sender.sin_addr), ip_addr, sizeof(ip_addr)) )
