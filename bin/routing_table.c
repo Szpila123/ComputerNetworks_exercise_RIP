@@ -269,17 +269,24 @@ void End_turn(){
 
         char addr[16];
         char dist[16];
+        char info[120];
         uint32_t addr_net = htonl(r_info[i].addr);
 
         inet_ntop( AF_INET, &addr_net, addr, sizeof(addr) );
-        sprintf( dist, "distance %d", r_info[i].dist );
 
-        printf("%s/%d %s %s %s\n",
+        //Create info text
+        sprintf( dist, "distance %d", r_info[i].dist );
+        if( r_info[i].dist >= MAX_DIST )
+            sprintf( info, "%s", "unrechabel connected directly" );
+        else if( r_info[i].is_indirect )
+            sprintf( info, "%s %s %s", dist, "via", r_info[i].next_addr);
+        else
+            sprintf( info, "%s %s", dist, "connected directly" );
+
+        printf("%s/%d %s \n",
                 addr,
                 r_info[i].mask,
-                r_info[i].dist >= MAX_DIST ? "unrechable" : dist,
-                r_info[i].is_indirect ? "via" : "connected",
-                r_info[i].is_indirect ? r_info[i].next_addr : "directly"  );
+                info );
 
         if( --r_info[i].last_info == 0 )
                 r_info[i].dist = MAX_DIST;
