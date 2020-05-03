@@ -276,7 +276,7 @@ void End_turn(){
         //Create info text
         sprintf( dist, "distance %d", r_info[i].dist );
         if( r_info[i].dist >= MAX_DIST )
-            sprintf( info, "%s", "unrechabel connected directly" );
+            sprintf( info, "%s", "unreachable connected directly" );
         else if( r_info[i].is_indirect )
             sprintf( info, "%s %s %s", dist, "via", r_info[i].next_addr);
         else
@@ -290,6 +290,7 @@ void End_turn(){
         if( --r_info[i].last_info == 0 )
                 r_info[i].dist = MAX_DIST;
     }
+    printf("\n");
     return;
 }
 
