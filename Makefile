@@ -24,7 +24,7 @@ bin/%.o: bin/%.c include/%.h
 
 distclean:
 	rm -vf $(OBJS)
-	rm -vf program
+	rm -vf program.out
 	rm -vf  $(ARCH).tar.xz
 
 clean:
@@ -38,4 +38,4 @@ archive:
 	tar cvJhf $(ARCH).tar.xz $(ARCH)
 	rm -r $(ARCH)
 
-.PHONY: all clean archive
+.PHONY: all clean distclean archive
