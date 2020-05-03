@@ -5,6 +5,7 @@
 #include <errno.h>
 
 #include <stdio.h>
+#include <strings.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -32,7 +33,7 @@ typedef struct {
     };
 
     uint32_t dist;
-    uint32_t last_info;
+    int32_t last_info;
     
     uint32_t addr;
     uint8_t  mask;
@@ -287,7 +288,7 @@ void End_turn(){
                 r_info[i].mask,
                 info );
 
-        if( --r_info[i].last_info == 0 )
+        if( r_info[i].last_info-- < 1 )
                 r_info[i].dist = MAX_DIST;
     }
     printf("\n");
