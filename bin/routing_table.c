@@ -302,7 +302,7 @@ static void rinfo_add( uint32_t addr, int8_t mask, char *next_addr, int32_t dist
     if( r_info_recs == r_info_size ){
 
         r_info_size    *= 2;
-        r_info          = (rout_info_t*) realloc( r_info, r_info_size );
+        r_info          = (rout_info_t*) realloc( r_info, r_info_size * sizeof(rout_info_t) );
 
         if( r_info == NULL )
             error( 1, 0, "Couldnt resize the routing info table\n" );
