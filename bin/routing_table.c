@@ -162,10 +162,16 @@ void Recv_routing_info( int32_t soc_fd, int32_t turn_time ){
         data.dist     = ntohl(    *((int32_t*) (buffer+sizeof(int32_t)+sizeof(int8_t)   )) );
 
         data.addr    &= get_mask( data.mask );
+
         //Convert sender address
         char ip_addr[16];
         if( ip_addr != inet_ntop(AF_INET, &(sender.sin_addr), ip_addr, sizeof(ip_addr)) )
             break;
+
+        #ifdef DEBUG
+            printf("\tReceived from %s\n", ip_addr );
+            printf("\tAddr: %x, mask %hhd, dist: %d\n", data.addr, data.mask, data.dist );
+        #endif
 
         //Get distance to sender
         uint32_t dist = get_dist( sender.sin_addr.s_addr );
