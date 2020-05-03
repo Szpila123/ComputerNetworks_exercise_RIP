@@ -198,7 +198,7 @@ void Recv_routing_info( int32_t soc_fd, int32_t turn_time ){
 
         //If network was not found in the routing table add it as new record
         if( i == r_info_recs )
-            rinfo_add( data.addr, data.mask, ip_addr, data.dist );
+            rinfo_add( data.addr, data.mask, ip_addr, data.dist + dist );
     }
 
     #ifdef DEBUG
