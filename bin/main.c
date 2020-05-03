@@ -7,6 +7,7 @@
 #include <inttypes.h>
 #include <error.h>
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -30,14 +31,14 @@ int main(){
     if( nof_ifcs < 1 )
         error( 1, 0, "Number of supplied interfaces should be more than zero\n");
 
-    ifce_s ifces[nof_ifcs];
+    ifce_s *ifces = (ifce_s*) malloc( nof_ifcs * sizeof(ifce_s) );
     for( int i = 0; i < nof_ifcs; i++ )
         if( scanf( 
                    " %[.0-9]/%hhd distance %d ",
                     ifces[i].addr,
                    &ifces[i].mask,
                    &ifces[i].dist
-         )
+                 )
             < 3 
       )
             error( 1, 0, "Supplied address in line %d is in incorrect format\n", i + 1);
