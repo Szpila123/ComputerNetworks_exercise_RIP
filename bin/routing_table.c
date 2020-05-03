@@ -255,7 +255,8 @@ void Send_routing_info( int32_t port ){
 void End_turn(){
     for( uint32_t i = 0 ; i < r_info_recs ; i++ ){
         char addr[16];
-        inet_ntop( AF_INET, &r_info[i].addr, addr, sizeof(addr) );
+        uint32_t addr_net = htonl(r_info[i].addr);
+        inet_ntop( AF_INET, &addr_net, addr, sizeof(addr) );
 
         printf("%s/%d distance %d %s %s\n", addr, r_info[i].mask, r_info[i].dist,
             r_info[i].is_indirect ? "via" : "connected", r_info[i].is_indirect ? r_info[i].next_addr : "directly"  );
