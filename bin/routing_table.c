@@ -174,7 +174,7 @@ void Recv_routing_info( int32_t soc_fd, int32_t turn_time ){
         #endif
 
         //Get distance to sender
-        uint32_t dist = get_dist( sender.sin_addr.s_addr );
+        uint32_t dist = get_dist( ntohl(sender.sin_addr.s_addr) );
 
         //Look for network address in routing table
         uint32_t i = 0;
